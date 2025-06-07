@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftOS | Interactive Facts</title>
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+   
+    <!-- html2canvas for screenshot functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+
+    <style>
+        /* === CSS VARIABLES === */
+       :root {
+          --color-bg-main: #0a0a1a;
+          --color-bg-gradient: #1c1c2b;
+          --color-text-primary: #f0f0f8;
+          --color-text-secondary: #b0b0c5;
+          
+          --glass-bg: rgba(25, 25, 50, 0.6);
+          --glass-border: rgba(255, 255, 255, 0.08);
+           --glass-bg-hover: rgba(45, 45, 70, 0.7);
+          --blur-amount: 15px;
+          --border-radius-lg: 16px;
+          --border-radius-md: 10px;
+           --border-radius-sm: 6px;
+
+           /* Dynamic Accent */
+           --accent-current: #e91e63; /* Lover Pink default */
+            --accent-glow: rgba(233, 30, 99, 0.4);
+
+           /* Era Colours */
+           --era-debut: #4DB6AC; /* Teal */
+           --era-fearless: #FFC107; /* Gold */
+           --era-speaknow: #9C27B0; /* Purple */
+           --era-red: #F44336;     /* Red */
+           --era-1989: #03A9F4;    /* Light Blue */
+           --era-reputation: #9E9E9E; /* Grey/Silver */
+           --era-lover: #e91e63; /* Pink */
+           --era-folklore: #795548; /* Sepia Brown */
+           --era-evermore: #FF9800; /* Burnt Orange */
+           --era-midnights: #3F51B5; /* Midnight Blue */
+            --era-ttpd: #E0E0E0; /* Alabaster */
+           --era-general: #4CAF50; /* Green */
+           --color-gold: #FFD700;
+           --color-silver: #C0C0C0;
+           --color-bronze: #CD7F32;
+
+
+           --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.4);
+           --transition-fast: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+           --transition-smooth: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* === BASE SETUP === */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+             -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--color-bg-main);
+            background-image: linear-gradient(to bottom right, var(--color-bg-main), var(--color-bg-gradient));
+            color: var(--color-text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden; /* Hide bg blob overflow */
+             -webkit-font-smoothing: antialiased;
+               -moz-osx-font-smoothing: grayscale;
+        }
+        
+         ::-webkit-scrollbar {
+          width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+           background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+          background: rgba(255,255,255,0.1);
+           border-radius: 4px;
+        }
+         ::-webkit-scrollbar-thumb:hover {
+           background: rgba(255,255,255,0.2);
+        }
+
+        /* === GLASSMORPHISM UTILITY === */
+         .glass {
+            background: var(--glass-bg);
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(var(--blur-amount));
+            -webkit-backdrop-filter: blur(var(--blur-amount)); /* Safari support */
+            box-shadow: var(--shadow-main);
+            transition: var(--transition-fast);
+         }
+          .glass-mini {
+             background: rgba(255, 255, 255, 0.05);
+             border-radius: var(--border-radius-sm);
+             border: 1px solid var(--glass-border);
+             backdrop-filter: blur(calc(var(--blur-amount)/2));
+             -webkit-backdrop-filter: blur(calc(var(--blur-amount)/2)); 
+          }
+         .glass:hover, .card:hover {
+             border-color: rgba(255, 255, 255, 0.15);
+         }
+
+        /* === ANIMATED BACKGROUND === */
+         #background-canvas {
+             position: fixed;
+             top: 0; left: 0; right: 0; bottom: 0;
+             z-index: -1;
+             overflow: hidden;
+         }
+         .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px); /* Soft edge for the blob itself */
+            opacity: 0.35;
+            animation: moveBlob 25s infinite alternate ease-in-out;
+         }
+          .blob:nth-child(1) {
+             width: 600px; height: 600px;
+             background: var(--era-lover);
+             top: -10%; left: -10%;
+              animation-duration: 20s;
+          }
+           .blob:nth-child(2) {
+              width: 700px; height: 500px;
+             background: var(--era-midnights);
+             bottom: -15%; right: -10%;
+              animation-duration: 30s;
+               animation-delay: -5s;
+          }
+           .blob:nth-child(3) {
+              width: 450px; height: 450px;
+             background: var(--era-1989);
+             top: 40%; left: 30%;
+              animation-duration: 45s;
+              animation-delay: -10s;
+          }
+           .blob:nth-child(4) {
+              width: 550px; height: 550px;
+             background: var(--era-speaknow);
+             top: 10%; right: 5%;
+              animation-duration: 38s;
+              animation-delay: -2s;
+              opacity: 0.25;
+          }
+
+        @keyframes moveBlob {
+          0% { transform: translate(0, 0) scale(1); }
+          25% { transform: translate(50px, -80px) scale(1.2); }
+          50% { transform: translate(-100px, 100px) scale(0.9); }
+           75% { transform: translate(120px, 60px) scale(1.3); }
+          100% { transform: translate(0, 0) scale(1); }
+        }
+        
+        /* === LAYOUT === */
+        .app-window {
+            display: flex;
+            width: 95%;
+            max-width: 1200px;
+            height: 85vh;
+            max-height: 800px;
+            overflow: hidden; /* Clip children */
+            position: relative;
+        }
+
+        .sidebar {
+            width: 220px; /* Fixed width */
+            min-width: 220px; /* Ensures it never shrinks below this */
+            padding: 25px 15px;
+            border-right: 1px solid var(--glass-border);
+             border-top-right-radius: 0;
+             border-bottom-right-radius: 0;
+             display: flex;
+             flex-direction: column;
+             position: relative; /* Added to establish stacking context */
+             z-index: 10; /* Ensures it's above other content if overlapping */
+        }
+
+        .main-content {
+            flex-grow: 1;
+             border-top-left-radius: 0;
+             border-bottom-left-radius: 0;
+             display: flex;
+             flex-direction: column;
+             overflow: hidden;
+        }
+        
+        .content-header {
+             padding: 20px 30px 15px 30px;
+             border-bottom: 1px solid var(--glass-border);
+             background: rgba(0,0,0,0.1);
+        }
+        .content-body {
+             padding: 30px;
+             flex-grow: 1;
+             overflow-y: auto; /* Allow scrolling */
+             overflow-x: hidden;
+             position: relative;
+        }
+
+         /* === TYPOGRAPHY & HIGHLIGHT === */
+         h1, h2, h3 {
+             color: var(--color-text-primary);
+             margin-bottom: 15px;
+             font-weight: 700;
+         }
+         h1 { font-size: 2em; }
+         h2 { font-size: 1.5em; }
+         h3 { font-size: 1.2em;}
+         
+         p {
+             color: var(--color-text-secondary);
+             line-height: 1.7;
+             margin-bottom: 15px;
+             font-weight: 400;
+         }
+         .highlight {
+             color: var(--accent-current);
+             text-shadow: 0 0 8px var(--accent-glow);
+             transition: var(--transition-smooth); /* smooth color change */
+         }
+         .highlight-bg {
+              background: var(--accent-current);
+             color: var(--color-bg-main);
+             padding: 2px 6px;
+             border-radius: var(--border-radius-sm);
+              transition: var(--transition-smooth);
+         }
+          .logo {
+            font-size: 1.4em;
+            font-weight: 800;
+            margin-bottom: 30px;
+            padding-left: 5px;
+            text-align: left;
+          }
+          .logo .highlight {
+            font-weight: 900;
+          }
+
+        /* === SIDEBAR NAV === */
+         .traffic-lights {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding-left: 5px;
+         }
+         .traffic-light {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: grey;
+         }
+          .traffic-light.close { background: #ff5f57; border: 1px solid #e14640;}
+          .traffic-light.min { background: #febc2e; border: 1px solid #e1a426;}
+           .traffic-light.max { background: #28c840; border: 1px solid #20a933;}
+            
+        .nav-list {
+            list-style: none;
+            flex-grow: 1;
+        }
+        .nav-item {
+           margin-bottom: 8px;
+        }
+        .nav-link {
+            display: block;
+            padding: 10px 15px;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            border-radius: var(--border-radius-md);
+             transition: var(--transition-fast);
+             font-size: 0.95em;
+             font-weight: 500;
+             cursor: pointer;
+             position: relative;
+             overflow: hidden;
+        }
+         .nav-link:hover, .nav-link.active {
+             background: var(--glass-bg-hover);
+             color: var(--color-text-primary);
+         }
+          .nav-link.active {
+             background: rgba(255,255,255, 0.1);
+             font-weight: 600;
+             /* Glow effect on active */
+             box-shadow: 0 0 15px var(--accent-glow);
+             border: 1px solid var(--accent-current);
+          }
+         .nav-link .icon {
+            margin-right: 8px;
+         }
+
+         /* Now Playing Widget */
+         .now-playing {
+             padding: 12px;
+             text-align: center;
+             font-size: 0.8em;
+             color: var(--color-text-secondary);
+             margin-top: 15px;
+             transition: var(--transition-smooth);
+             border: 1px solid transparent;
+         }
+         .now-playing strong {
+            display: block;
+            color: var(--color-text-primary);
+            margin-top: 4px;
+            font-weight: 600;
+            color: var(--accent-current);
+             text-shadow: 0 0 4px var(--accent-glow);
+         }
+          .now-playing:hover {
+             border-color: var(--glass-border);
+          }
+
+         /* === CONTENT SECTIONS === */
+         .content-section {
+             display: none; /* Hidden by default */
+             animation: fadeIn 0.5s ease-in-out;
+         }
+          .content-section.active {
+              display: block;
+          }
+         @keyframes fadeIn {
+             from { opacity: 0; transform: translateY(10px); }
+             to { opacity: 1; transform: translateY(0); }
+         }
+
+        /* === BUTTONS === */
+        .btn {
+            background-color: var(--accent-current);
+            color: var(--color-bg-main);
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition-fast);
+            box-shadow: 0 0 0px var(--accent-glow);
+            text-shadow: none;
+        }
+         .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--accent-glow);
+            opacity: 0.9;
+         }
+         .btn:disabled {
+             background-color: #555;
+             cursor: not-allowed;
+             opacity: 0.5;
+             transform: none;
+             box-shadow: none;
+         }
+          .btn-outline {
+            background-color: transparent;
+            color: var(--accent-current);
+            border: 1px solid var(--accent-current);
+          }
+           .btn-outline:hover:not(:disabled) {
+            background-color: var(--accent-current);
+            color: var(--color-bg-main);
+           }
+
+        /* === FACT DISPLAY === */
+        #fact-display {
+            padding: 30px;
+            margin-bottom: 25px;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+         #fact-display p {
+             font-size: 1.3em;
+            font-weight: 500;
+            color: var(--color-text-primary);
+         }
+         #fact-display span {
+             display: block;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: var(--accent-current);
+            font-style: italic;
+         }
+
+        /* === CARDS (Eras / Quiz) === */
+         .card-grid {
+             display: grid;
+             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+             gap: 20px;
+         }
+         .card {
+             padding: 20px;
+             text-align: center;
+             border-radius: var(--border-radius-md);
+             aspect-ratio: 1 / 1.1;
+             display: flex;
+             flex-direction: column;
+             justify-content: center;
+             align-items: center;
+             cursor: pointer;
+             border: 1px solid var(--glass-border);
+             transition: var(--transition-fast);
+             background: rgba(0,0,0,0.2);
+         }
+         .card:hover {
+             transform: translateY(-5px) scale(1.02);
+              box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+               background: rgba(0,0,0,0.3);
+         }
+         .card h4 {
+             margin-top: 10px;
+             font-size: 1.1em;
+             color: white;
+         }
+          .card p {
+           font-size: 0.8em;
+           margin-bottom: 0;
+          }
+          .card .emoji {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+             filter: drop-shadow(0 0 5px rgba(0,0,0,0.3));
+          }
+          /* Era specific card styling */
+           .card[data-era="debut"]:hover       { border-color: var(--era-debut); box-shadow: 0 0 20px rgba(77, 182, 172, 0.4);}
+           .card[data-era="fearless"]:hover   { border-color: var(--era-fearless); box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);}
+           .card[data-era="speaknow"]:hover  { border-color: var(--era-speaknow); box-shadow: 0 0 20px rgba(156, 39, 176, 0.4);}
+           .card[data-era="red"]:hover        { border-color: var(--era-red); box-shadow: 0 0 20px rgba(244, 67, 54, 0.4);}
+           .card[data-era="1989"]:hover       { border-color: var(--era-1989); box-shadow: 0 0 20px rgba(3, 169, 244, 0.4);}
+           .card[data-era="reputation"]:hover { border-color: var(--era-reputation); box-shadow: 0 0 20px rgba(158, 158, 158, 0.4);}
+           .card[data-era="lover"]:hover      { border-color: var(--era-lover); box-shadow: 0 0 20px rgba(233, 30, 99, 0.4);}
+           .card[data-era="folklore"]:hover   { border-color: var(--era-folklore); box-shadow: 0 0 20px rgba(121, 85, 72, 0.4);}
+           .card[data-era="evermore"]:hover   { border-color: var(--era-evermore); box-shadow: 0 0 20px rgba(255, 152, 0, 0.4);}
+           .card[data-era="midnights"]:hover  { border-color: var(--era-midnights); box-shadow: 0 0 20px rgba(63, 81, 181, 0.4);}
+           .card[data-era="ttpd"]:hover  { border-color: var(--era-ttpd); box-shadow: 0 0 20px rgba(224, 224, 224, 0.4);}
+
+        /* === QUIZ === */
+         .quiz-options {
+             display: grid;
+             grid-template-columns: 1fr 1fr;
+             gap: 15px;
+             margin: 20px 0;
+         }
+         .quiz-option {
+             padding: 15px;
+             border-radius: var(--border-radius-md);
+             cursor: pointer;
+             transition: var(--transition-fast);
+             text-align: left;
+             font-size: 0.95em;
+              background: rgba(255,255,255,0.03);
+               border: 1px solid var(--glass-border);
+         }
+          .quiz-option:hover {
+              background: var(--glass-bg-hover);
+               border-color: var(--accent-current);
+          }
+           .quiz-option.correct { background-color: #28c840; color: black; border-color: #20a933; }
+           .quiz-option.wrong { background-color: #ff5f57;  color: black; border-color: #e14640;}
+            .quiz-option.disabled { pointer-events: none; opacity: 0.7; }
+            #quiz-feedback {
+                margin-top: 15px; font-weight: bold;
+            }
+
+        /* === ALBUM LIST & RANKING RESULTS === */
+         .album-list { list-style: none; }
+         .album-item {
+             display: flex;
+             align-items: center;
+             padding: 12px;
+             border-radius: var(--border-radius-md);
+             margin-bottom: 10px;
+             transition: var(--transition-fast);
+              border: 1px solid var(--glass-border);
+              background: rgba(0,0,0,0.15);
+         }
+         .album-item:hover {
+             background: var(--glass-bg-hover);
+         }
+         .album-rank {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            margin-right: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+         }
+         .album-info p {
+            margin: 0;
+            font-size: 0.85em;
+         }
+         .album-info h4 {
+           margin: 0;
+           font-size: 1em;
+           color: var(--color-text-primary);
+           font-weight: 500;
+         }
+          .album-version {
+             margin-left: auto;
+             font-size: 0.75em;
+             padding: 3px 8px;
+             color: var(--color-text-secondary);
+          }
+
+        /* === SONG RANKING SPECIFIC STYLES === */
+        .ranking-container { display: none; }
+        .ranking-container.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        
+        .album-card {
+            aspect-ratio: 1 / 1;
+        }
+        .album-card.selected {
+            border-color: var(--accent-current);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+        #album-selection-container .card-grid {
+             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+
+        #ranking-progress {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--accent-current);
+            border-radius: 4px;
+            transition: width 0.3s ease-out;
+        }
+        #comparison-counter {
+            font-size: 0.9em;
+            color: var(--color-text-secondary);
+        }
+        
+        #song-battle {
+            display: flex;
+            justify-content: space-around;
+            align-items: stretch; /* Make buttons same height */
+            gap: 20px;
+            min-height: 200px;
+        }
+        .song-option {
+            flex: 1;
+            padding: 20px;
+            font-size: 1.2em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: var(--transition-fast);
+            border-width: 2px;
+        }
+        .song-option:hover {
+            transform: scale(1.03);
+            border-color: var(--accent-current);
+        }
+
+        #podium {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 15px;
+            margin-bottom: 30px;
+            min-height: 150px;
+        }
+        .podium-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 30%;
+        }
+        .podium-item .album-rank {
+            font-size: 1.5em;
+            width: 50px;
+            height: 50px;
+            margin-bottom: 10px;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+        .podium-item h4 {
+            font-size: 1.1em;
+            line-height: 1.3;
+        }
+        .podium-item.gold { order: 2; }
+        .podium-item.silver { order: 1; transform: translateY(15px); }
+        .podium-item.bronze { order: 3; transform: translateY(15px); }
+        .podium-item.gold .album-rank {
+            background-color: var(--color-gold);
+            color: #333;
+            border: 2px solid #fff;
+            transform: scale(1.2);
+        }
+        .podium-item.silver .album-rank {
+            background-color: var(--color-silver);
+            color: #333;
+        }
+        .podium-item.bronze .album-rank {
+            background-color: var(--color-bronze);
+            color: #eee;
+        }
+
+        /* Screenshot Target Styling (Hidden) */
+        #screenshot-target {
+            display: none;
+            padding: 30px;
+            background: var(--color-bg-main);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-main);
+            color: var(--color-text-primary);
+            width: 400px;
+            min-height: 300px;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+        }
+        #screenshot-target h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.6em;
+            font-weight: 700;
+        }
+        #screenshot-target ol {
+            list-style: decimal;
+            padding-left: 25px;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+        #screenshot-target ol li {
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        #screenshot-target p {
+            font-size: 0.85em;
+            color: var(--color-text-secondary);
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* === MODAL === */
+         #modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+             -webkit-backdrop-filter: blur(5px);
+            display: none; /* Hidden */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+             animation: fadeInModal 0.3s ease-out;
+         }
+          #modal-overlay.show {
+             display: flex;
+          }
+           @keyframes fadeInModal {
+             from { opacity: 0; }
+             to { opacity: 1; }
+           }
+         .modal-content {
+            padding: 30px;
+            max-width: 500px;
+            width: 80%;
+             position: relative;
+             animation: slideInModal 0.4s ease-out;
+         }
+          @keyframes slideInModal {
+             from { opacity: 0; transform: translateY(-50px); }
+             to { opacity: 1;  transform: translateY(0);}
+           }
+         .modal-close {
+            position: absolute;
+            top: 15px; right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.8em;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+         }
+          .modal-close:hover { color: var(--color-text-primary); }
+
+        /* === RESPONSIVE (IMPROVED) === */
+        @media (max-width: 768px) {
+           .app-window {
+              flex-direction: column;
+              height: 95vh;
+              max-height: none;
+           }
+            .sidebar {
+              width: 100%; /* FIXED: Ensure sidebar takes full width */
+              height: auto;
+              padding: 10px;
+              border-right: none;
+              border-bottom: 1px solid var(--glass-border);
+              border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+            }
+            .main-content {
+              border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg) ;
+            }
+           .logo, .traffic-lights, .now-playing { display: none;}
+           .nav-list {
+                display: flex;
+                overflow-x: auto;
+                padding-bottom: 8px; /* Extra space for scrollbar */
+                scrollbar-width: thin; /* Firefox */
+                scrollbar-color: var(--accent-current) transparent; /* Firefox */
+            }
+            /* Custom scrollbar for webkit browsers */
+            .nav-list::-webkit-scrollbar {
+                height: 5px;
+            }
+            .nav-list::-webkit-scrollbar-track {
+                background: rgba(0,0,0,0.2);
+                border-radius: 10px;
+            }
+            .nav-list::-webkit-scrollbar-thumb {
+                background-color: var(--accent-current);
+                border-radius: 10px;
+            }
+
+           .nav-item { margin: 0 5px 0 0; white-space: nowrap;}
+            .nav-link { padding: 8px 12px; }
+            .content-body { padding: 15px; }
+            .content-header { padding: 15px;}
+            h1 { font-size: 1.5em;}
+            h2 { font-size: 1.3em; }
+            h3 { font-size: 1.1em; }
+            
+            .quiz-options { grid-template-columns: 1fr;}
+            .card-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));}
+             body { padding: 5px;}
+             .blob { opacity: 0.2;}
+
+            /* Adjust song battle for small screens */
+            #song-battle {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .song-option {
+                width: 100%;
+                padding: 15px 10px;
+                font-size: 1em;
+            }
+            #song-battle span {
+                display: none; /* Hide the VS text when stacked */
+            }
+
+            /* Adjust podium for small screens */
+            #podium {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            .podium-item {
+                width: 100%;
+                max-width: 250px;
+            }
+            .podium-item.silver, .podium-item.bronze {
+                transform: translateY(0);
+                order: 0;
+            }
+            .podium-item.gold {
+                 order: -1; /* Keep gold at the top */
+                 transform: scale(1.05); /* Make it slightly bigger still */
+            }
+
+            /* Adjust modal for small screens */
+            .modal-content {
+                width: 90%;
+                padding: 20px;
+            }
+        }
+         
+    </style>
+</head>
+
+<body>
+    <!-- Animated Background -->
+     <div id="background-canvas">
+         <div class="blob"></div>
+         <div class="blob"></div>
+         <div class="blob"></div>
+          <div class="blob"></div>
+     </div>
+
+
+    <!-- Main Application Window -->
+    <div class="app-window glass">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="traffic-lights">
+                <div class="traffic-light close"></div>
+                <div class="traffic-light min"></div>
+                <div class="traffic-light max"></div>
+            </div>
+             <div class="logo">Swift<span class="highlight">OS</span></div>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a class="nav-link active" data-section="home" data-color="--era-lover"><span class="icon">🏠</span>Home</a>
+                 </li>
+                <li class="nav-item">
+                   <a class="nav-link" data-section="facts" data-color="--era-general"><span class="icon">✨</span>Random Facts</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-section="eras" data-color="--era-1989"><span class="icon">💿</span>The Eras</a>
+                </li>
+                 <li class="nav-item">
+                    <a class="nav-link" data-section="quiz" data-color="--era-speaknow"><span class="icon">❓</span>Swiftie Quiz</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-section="song-ranking" data-color="--era-evermore"><span class="icon">🎶</span>Song Ranking</a>
+                </li>
+            </ul>
+             <div class="now-playing glass-mini">
+                 🎧 Now Playing:
+                 <strong id="now-playing-song">---</strong>
+             </div>
+        </aside>
+
+
+        <!-- Main Content Area -->
+        <main class="main-content glass">
+            
+            <div class="content-header">
+                 <h1 id="section-title">Welcome to Swift<span class="highlight">OS</span></h1>
+            </div>
+
+
+            <div class="content-body">
+
+                <!-- All content sections are siblings -->
+                <div id="section-home" class="content-section active"></div>
+                <div id="section-facts" class="content-section"></div>
+                <div id="section-eras" class="content-section"></div>
+                <div id="section-quiz" class="content-section"></div>
+
+
+                <!-- NEW SECTION: SONG RANKING -->
+                <div id="section-song-ranking" class="content-section">
+                    
+                    <!-- Step 1: Album Selection -->
+                    <div id="album-selection-container" class="ranking-container active">
+                        <h2>Choose an Album to Rank</h2>
+                        <p>Tap an album to begin ranking its songs.</p>
+                        <div id="album-selection-grid" class="card-grid">
+                            <!-- Album cards will be generated here -->
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Ranking Area -->
+                    <div id="ranking-area" class="ranking-container">
+                        <h2 id="current-album-title">Ranking Songs...</h2>
+                        <div id="ranking-progress">
+                            <p id="comparison-counter">Comparison 1 of X</p>
+                            <div class="progress-bar-container">
+                                <div id="progress-bar" class="progress-bar"></div>
+                            </div>
+                        </div>
+                        <div id="song-battle" class="glass-mini" style="padding: 20px;">
+                            <button class="song-option btn btn-outline" id="song-option-1"></button>
+                            <span style="font-size: 1.5em; font-weight: bold; color: var(--color-text-primary); margin: 0 15px;">VS</span>
+                            <button class="song-option btn btn-outline" id="song-option-2"></button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Results -->
+                    <div id="ranked-results-container" class="ranking-container">
+                        <h3>Your Top Songs for <span id="ranked-album-name" class="highlight">Album</span></h3>
+                        <p>Here's your definitive ranking based on your choices!</p>
+                        
+                        <div id="podium" class="glass-mini" style="padding: 20px;">
+                            <!-- Top 3 podium items generated here -->
+                        </div>
+
+                        <h4>Full Ranking:</h4>
+                        <div id="ranked-list" class="album-list" style="margin-top: 15px;">
+                            <!-- Ranked songs displayed here -->
+                        </div>
+                        <div style="margin-top: 25px; display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button id="share-ranking-btn" class="btn">Share Your Ranking</button>
+                            <button id="rank-again-btn" class="btn btn-outline">Rank Another Album</button>
+                        </div>
+                    </div>
+
+                    <!-- Hidden canvas for screenshot -->
+                    <div id="screenshot-target">
+                        <h3>My Top Songs for <span id="screenshot-album-name" class="highlight"></span></h3>
+                        <ol id="screenshot-ranked-list"></ol>
+                        <p>Ranked with SwiftOS</p>
+                    </div>
+                </div>
+            </div> <!-- /content-body -->
+        </main>
+    </div>
+
+
+     <!-- Modal -->
+      <div id="modal-overlay">
+          <div class="modal-content glass">
+              <button class="modal-close" id="modal-close-btn">×</button>
+               <h2 id="modal-title">Modal Title</h2>
+               <p id="modal-body">Modal content goes here.</p>
+          </div>
+      </div>
+
+
+    <script>
+       // Fill in the '...' in the HTML sections for brevity in this example
+       document.getElementById('section-home').innerHTML = `<h2>Hello, <span class="highlight">Swiftie!</span></h2><p>Welcome to the interactive fact machine. Explore random trivia, dive deep into the different Eras, test your knowledge with a quiz, or create your definitive song ranking.</p><p>This interface uses a 'Glassmorphism' design with backdrop blur effects, inspired by modern OS design, combining a dark theme with vibrant colours from Taylor Swift's iconic Eras.</p><div class="glass-mini" style="padding: 20px;"><h3>Did you know?</h3><p>The current <span class="highlight-bg">highlight colour</span> changes dynamically based on the section or Era you are viewing!</p></div>`;
+       document.getElementById('section-facts').innerHTML = `<h2>Random <span class="highlight">Facts</span></h2><div id="fact-display" class="glass-mini"><p>Loading fact...</p><span>Source: General</span></div><button id="new-fact-btn" class="btn">✨ Get Another Fact</button>`;
+       document.getElementById('section-eras').innerHTML = `<h2>Explore The <span class="highlight">Eras</span></h2><p>Click on a card to view details and change the theme colour.</p><div id="eras-grid" class="card-grid"></div>`;
+       document.getElementById('section-quiz').innerHTML = `<h2>Swiftie <span class="highlight">Quiz</span></h2><div id="quiz-container"><p>Test your knowledge!</p><button id="start-quiz-btn" class="btn">Start Quiz</button></div><div id="quiz-question"></div><div id="quiz-options" class="quiz-options"></div><div id="quiz-feedback"></div><button id="next-quiz-btn" class="btn" style="display:none; margin-top: 15px;">Next Question</button><div id="quiz-results"></div>`;
+       
+       // === DOM Elements ===
+       const root = document.documentElement;
+       const sectionTitleEl = document.getElementById('section-title');
+       const navLinks = document.querySelectorAll('.nav-link');
+       const contentSections = document.querySelectorAll('.content-section');
+       const newFactBtn = document.getElementById('new-fact-btn');
+       const erasGrid = document.getElementById('eras-grid');
+       const modalOverlay = document.getElementById('modal-overlay');
+       const modalTitle = document.getElementById('modal-title');
+       const modalBody = document.getElementById('modal-body');
+       const modalCloseBtn = document.getElementById('modal-close-btn');
+       const nowPlayingSongEl = document.getElementById('now-playing-song');
+       
+       // Quiz Elements
+       const startQuizBtn = document.getElementById('start-quiz-btn');
+       const nextQuizBtn = document.getElementById('next-quiz-btn');
+
+       // Song Ranking Elements
+       const albumSelectionGrid = document.getElementById('album-selection-grid');
+       const rankingContainers = document.querySelectorAll('.ranking-container');
+       const rankingArea = document.getElementById('ranking-area');
+       const currentAlbumTitleEl = document.getElementById('current-album-title');
+       const comparisonCounterEl = document.getElementById('comparison-counter');
+       const progressBar = document.getElementById('progress-bar');
+       const songOption1Btn = document.getElementById('song-option-1');
+       const songOption2Btn = document.getElementById('song-option-2');
+       const rankedResultsContainer = document.getElementById('ranked-results-container');
+       const rankedAlbumNameEl = document.getElementById('ranked-album-name');
+       const podiumEl = document.getElementById('podium');
+       const rankedListEl = document.getElementById('ranked-list');
+       const shareRankingBtn = document.getElementById('share-ranking-btn');
+       const rankAgainBtn = document.getElementById('rank-again-btn');
+       const screenshotTarget = document.getElementById('screenshot-target');
+       const screenshotAlbumNameEl = document.getElementById('screenshot-album-name');
+       const screenshotRankedListEl = document.getElementById('screenshot-ranked-list');
+
+       // === DATA (Complete and Corrected) ===
+       const allAlbumsData = [
+            {
+                id: 'debut', name: 'Taylor Swift', year: '2006', emoji: '🦋', colorVar: '--era-debut', tracks: [
+                    'Tim McGraw', 'Picture To Burn', 'Teardrops On My Guitar', 'A Place in This World',
+                    'Cold As You', 'The Outside', 'Tied Together with a Smile', 'Stay Beautiful',
+                    'Should\'ve Said No', 'Mary\'s Song (Oh My My My)', 'Our Song',
+                    'I\'m Only Me When I\'m With You', 'Invisible', 'A Perfectly Good Heart'
+                ]
+            },
+            {
+                id: 'fearless', name: 'Fearless (Taylor\'s Version)', year: '2021', emoji: '✨', colorVar: '--era-fearless', tracks: [
+                    'Fearless', 'Fifteen', 'Love Story', 'Hey Stephen', 'White Horse',
+                    'You Belong With Me', 'Breathe (feat. Colbie Caillat)',
+                    'Tell Me Why', 'You\'re Not Sorry', 'The Way I Loved You',
+                    'Forever & Always', 'The Best Day', 'Change', 'Jump Then Fall',
+                    'Untouchable', 'Forever & Always (Piano Version)',
+                    'Come In With The Rain', 'Superstar', 'The Other Side of the Door',
+                    'Today Was a Fairytale', 'You All Over Me (feat. Maren Morris)',
+                    'Mr. Perfectly Fine', 'We Were Happy', 'That\'s When (feat. Keith Urban)',
+                    'Don\'t You', 'Bye Bye Baby'
+                ]
+            },
+            {
+                id: 'speaknow', name: 'Speak Now (Taylor\'s Version)', year: '2023', emoji: '💜', colorVar: '--era-speaknow', tracks: [
+                    'Mine', 'Sparks Fly', 'Back To December', 'Speak Now', 'Dear John', 'Mean',
+                    'The Story Of Us', 'Never Grow Up', 'Enchanted', 'Better Than Revenge',
+                    'Innocent', 'Haunted', 'Last Kiss', 'Long Live', 'Ours', 'Superman',
+                    'Electric Touch (feat. Fall Out Boy)', 'When Emma Falls in Love',
+                    'I Can See You', 'Castles Crumbling (feat. Hayley Williams)', 'Foolish One', 'Timeless'
+                ]
+            },
+            {
+                id: 'red', name: 'Red (Taylor\'s Version)', year: '2021', emoji: '🧣', colorVar: '--era-red', tracks: [
+                    'State Of Grace', 'Red', 'Treacherous', 'I Knew You Were Trouble',
+                    'All Too Well', '22', 'I Almost Do', 'We Are Never Ever Getting Back Together',
+                    'Stay Stay Stay', 'The Last Time (feat. Gary Lightbody)', 'Holy Ground',
+                    'Sad Beautiful Tragic', 'The Lucky One', 'Everything Has Changed (feat. Ed Sheeran)',
+                    'Starlight', 'Begin Again', 'The Moment I Knew', 'Come Back... Be Here',
+                    'Girl At Home', 'State Of Grace (Acoustic Version)', 'Ronan', 'Better Man',
+                    'Nothing New (feat. Phoebe Bridgers)', 'Babe', 'Message In A Bottle',
+                    'I Bet You Think About Me (feat. Chris Stapleton)', 'Forever Winter',
+                    'Run (feat. Ed Sheeran)', 'The Very First Night', 'All Too Well (10 Minute Version)'
+                ]
+            },
+            {
+                id: '1989', name: '1989 (Taylor\'s Version)', year: '2023', emoji: '🏙️', colorVar: '--era-1989', tracks: [
+                    'Welcome To New York', 'Blank Space', 'Style', 'Out Of The Woods',
+                    'All You Had To Do Was Stay', 'Shake It Off', 'I Wish You Would',
+                    'Bad Blood', 'Wildest Dreams', 'How You Get The Girl', 'This Love',
+                    'I Know Places', 'Clean', 'Wonderland', 'You Are In Love', 'New Romantics',
+                    '"Slut!"', 'Say Don\'t Go', 'Now That We Don\'t Talk', 'Suburban Legends', 'Is It Over Now?'
+                ]
+            },
+            {
+                id: 'reputation', name: 'Reputation', year: '2017', emoji: '🐍', colorVar: '--era-reputation', tracks: [
+                    '...Ready For It?', 'End Game (feat. Ed Sheeran & Future)', 'I Did Something Bad',
+                    'Don\'t Blame Me', 'Delicate', 'Look What You Made Me Do', 'So It Goes...',
+                    'Gorgeous', 'Getaway Car', 'King Of My Heart', 'Dancing With Our Hands Tied',
+                    'Dress', 'This Is Why We Can\'t Have Nice Things', 'Call It What You Want', 'New Year\'s Day'
+                ]
+            },
+            {
+                id: 'lover', name: 'Lover', year: '2019', emoji: '💖', colorVar: '--era-lover', tracks: [
+                    'I Forgot That You Existed', 'Cruel Summer', 'Lover', 'The Man', 'The Archer',
+                    'I Think He Knows', 'Miss Americana & The Heartbreak Prince', 'Paper Rings',
+                    'Cornelia Street', 'Death By A Thousand Cuts', 'London Boy',
+                    'Soon You\'ll Get Better (feat. The Chicks)', 'False God',
+                    'You Need To Calm Down', 'Afterglow', 'ME! (feat. Brendon Urie of Panic! At The Disco)',
+                    'It\'s Nice To Have A Friend', 'Daylight'
+                ]
+            },
+            {
+                id: 'folklore', name: 'folklore', year: '2020', emoji: '🌲', colorVar: '--era-folklore', tracks: [
+                    'the 1', 'cardigan', 'the last great american dynasty', 'exile (feat. Bon Iver)',
+                    'my tears ricochet', 'mirrorball', 'seven', 'august', 'this is me trying',
+                    'illicit affairs', 'invisible string', 'mad woman', 'epiphany', 'betty',
+                    'peace', 'hoax', 'the lakes'
+                ]
+            },
+            {
+                id: 'evermore', name: 'evermore', year: '2020', emoji: '🍂', colorVar: '--era-evermore', tracks: [
+                    'willow', 'champagne problems', 'gold rush', '\'tis the damn season', 'tolerate it',
+                    'no body, no crime (feat. HAIM)', 'happiness', 'dorothea', 'coney island (feat. The National)',
+                    'ivy', 'cowboy like me', 'long story short', 'marjorie', 'closure', 'evermore (feat. Bon Iver)',
+                    'right where you left me', 'it\'s time to go'
+                ]
+            },
+            {
+                id: 'midnights', name: 'Midnights (3am Edition)', year: '2022', emoji: '🕰️', colorVar: '--era-midnights', tracks: [
+                    'Lavender Haze', 'Maroon', 'Anti-Hero', 'Snow On The Beach (feat. Lana Del Rey)',
+                    'You\'re On Your Own, Kid', 'Midnight Rain', 'Question...?', 'Vigilante Shit',
+                    'Bejeweled', 'Labyrinth', 'Karma', 'Sweet Nothing', 'Mastermind', 'The Great War',
+                    'Bigger Than The Whole Sky', 'Paris', 'High Infidelity', 'Glitch',
+                    'Would\'ve, Could\'ve, Should\'ve', 'Dear Reader'
+                ]
+            },
+            {
+                id: 'ttpd', name: 'TTPD: The Anthology', year: '2024', emoji: '✍🏻', colorVar: '--era-ttpd', tracks: [
+                    'Fortnight (feat. Post Malone)', 'The Tortured Poets Department',
+                    'My Boy Only Breaks His Favorite Toys', 'Down Bad', 'So Long, London',
+                    'But Daddy I Love Him', 'Fresh Out The Slammer', 'Florida!!! (feat. Florence + The Machine)',
+                    'Guilty as Sin?', 'Who\'s Afraid of Little Old Me?', 'I Can Fix Him (No Really I Can)',
+                    'loml', 'I Can Do It With a Broken Heart', 'The Smallest Man Who Ever Lived',
+                    'The Alchemy', 'Clara Bow', 'The Black Dog', 'imgonnagetyouback', 'The Albatross',
+                    'Chloe or Sam or Sophia or Marcus', 'How Did It End?', 'So High School', 'I Hate It Here',
+                    'thanK you aIMee', 'I Look in People\'s Windows', 'The Prophecy', 'Cassandra',
+                    'Peter', 'The Bolter', 'Robin', 'The Manuscript'
+                ]
+            },
+       ];
+       const facts = [{ text: "The entire 'Speak Now' album was written solely by Taylor Swift.", source: "Speak Now", era: "speaknow" }];
+       const quizQuestions = [{ question: "Which album did Taylor Swift write entirely by herself?", options: ["Fearless", "Speak Now", "Red", "1989"], answer: "Speak Now", era: 'speaknow' }];
+
+       // === STATE VARIABLES ===
+       let selectedAlbumForRanking = null;
+       let comparison_fn;
+
+       // === FUNCTIONS ===
+       
+       function setAccentColor(colorVar) {
+            if (!colorVar) return;
+            const colorValue = getComputedStyle(root).getPropertyValue(colorVar).trim();
+            root.style.setProperty('--accent-current', colorValue);
+            const glowColor = `${colorValue}66`; 
+            root.style.setProperty('--accent-glow', glowColor);
+       }
+
+       function showSection(sectionId) {
+           contentSections.forEach(section => section.classList.remove('active'));
+           document.getElementById(`section-${sectionId}`).classList.add('active');
+           
+           navLinks.forEach(link => {
+               link.classList.toggle('active', link.dataset.section === sectionId);
+               if(link.dataset.section === sectionId) {
+                   const titleText = link.textContent.replace(/[\u{1F300}-\u{1F5FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}]/gu, '').trim();
+                   sectionTitleEl.innerHTML = `${titleText} <span class="highlight">OS</span>`;
+                   setAccentColor(link.dataset.color);
+               }
+           });
+           if (sectionId !== 'song-ranking') resetSongRankingUI();
+       }
+        
+       function displayRandomFact() {
+            const factDisplay = document.getElementById('fact-display');
+            if(!factDisplay) return;
+            const fact = facts[Math.floor(Math.random() * facts.length)];
+            factDisplay.innerHTML = `<p>${fact.text}</p><span>Source: ${fact.source}</span>`;
+       }
+
+       function createEraCards() {
+            erasGrid.innerHTML = '';
+            allAlbumsData.forEach(era => {
+                const card = document.createElement('div');
+                card.className = 'card glass-mini';
+                card.innerHTML = `<div class="emoji">${era.emoji}</div><h4>${era.name}</h4><p>${era.year}</p>`;
+                card.addEventListener('click', () => { /* open modal logic */ });
+                erasGrid.appendChild(card);
+            });
+       }
+        
+       // === SONG RANKING LOGIC (MERGE SORT) ===
+       
+       function populateAlbumSelectionGrid() {
+            albumSelectionGrid.innerHTML = '';
+            allAlbumsData.forEach(album => {
+                const card = document.createElement('div');
+                card.className = 'card glass-mini album-card';
+                card.dataset.albumId = album.id;
+                card.innerHTML = `<div class="emoji">${album.emoji}</div><h4>${album.name}</h4><p>${album.tracks.length} tracks</p>`;
+                
+                card.addEventListener('click', () => {
+                    selectedAlbumForRanking = allAlbumsData.find(a => a.id === card.dataset.albumId);
+                    if(selectedAlbumForRanking) {
+                        setAccentColor(selectedAlbumForRanking.colorVar);
+                        startRankingProcess();
+                    }
+                });
+                albumSelectionGrid.appendChild(card);
+            });
+       }
+
+       async function startRankingProcess() {
+            if (!selectedAlbumForRanking) return;
+            
+            switchRankingView('ranking-area');
+            currentAlbumTitleEl.innerHTML = `Ranking songs from <span class="highlight">${selectedAlbumForRanking.name}</span>`;
+
+            const tracks = [...selectedAlbumForRanking.tracks];
+            let comparisonsMade = 0;
+            
+            const compareSongs = async (songA, songB) => {
+                comparisonsMade++;
+                comparisonCounterEl.textContent = `Comparison ${comparisonsMade}`;
+                return new Promise(resolve => {
+                    songOption1Btn.textContent = songA;
+                    songOption2Btn.textContent = songB;
+                    comparison_fn = (winner) => resolve(winner === songA);
+                });
+            };
+            
+            let totalProgress = 0;
+            const sortedTracks = await mergeSort(tracks, compareSongs, (progress) => {
+                totalProgress = progress;
+                 progressBar.style.width = `${totalProgress * 100}%`;
+            });
+            
+            finishRanking(sortedTracks);
+       }
+       
+       async function mergeSort(arr, compare, onProgress) {
+            if (arr.length <= 1) return arr;
+            
+            const mid = Math.floor(arr.length / 2);
+            const left = arr.slice(0, mid);
+            const right = arr.slice(mid);
+
+            const sortedLeft = await mergeSort(left, compare, (p) => onProgress(p * (left.length / arr.length)));
+            const sortedRight = await mergeSort(right, compare, (p) => onProgress((left.length / arr.length) + p * (right.length / arr.length)));
+            
+            return merge(sortedLeft, sortedRight, compare);
+       }
+       
+       async function merge(left, right, compare) {
+            let result = [];
+            let i = 0, j = 0;
+            
+            while (i < left.length && j < right.length) {
+                const isLeftPreferred = await compare(left[i], right[j]);
+                if (isLeftPreferred) {
+                    result.push(left[i++]);
+                } else {
+                    result.push(right[j++]);
+                }
+            }
+            return result.concat(left.slice(i)).concat(right.slice(j));
+       }
+
+       function handleChoice(option) {
+            if (comparison_fn) {
+                const winner = option === 1 ? songOption1Btn.textContent : songOption2Btn.textContent;
+                comparison_fn(winner);
+            }
+       }
+        
+       function finishRanking(sortedTracks) {
+            switchRankingView('ranked-results-container');
+            rankedAlbumNameEl.textContent = selectedAlbumForRanking.name;
+            podiumEl.innerHTML = '';
+            rankedListEl.innerHTML = '';
+            
+            sortedTracks.forEach((song, index) => {
+                const rank = index + 1;
+                if (rank <= 3) {
+                    const podiumItem = document.createElement('div');
+                    const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : 'bronze';
+                    podiumItem.className = `podium-item ${rankClass}`;
+                    podiumItem.innerHTML = `<div class="album-rank">${rank}</div><h4>${song}</h4>`;
+                    podiumEl.appendChild(podiumItem);
+                }
+                
+                const listItem = document.createElement('li');
+                listItem.className = 'album-item glass-mini';
+                listItem.innerHTML = `<div class="album-rank">${rank}</div><div class="album-info"><h4>${song}</h4></div>`;
+                rankedListEl.appendChild(listItem);
+            });
+
+            screenshotAlbumNameEl.textContent = selectedAlbumForRanking.name;
+            screenshotRankedListEl.innerHTML = sortedTracks.map((song, i) => `<li>${i + 1}. ${song}</li>`).join('');
+       }
+        
+       function switchRankingView(viewId) {
+            rankingContainers.forEach(container => {
+                container.classList.toggle('active', container.id === viewId);
+            });
+       }
+
+       function resetSongRankingUI() {
+            switchRankingView('album-selection-container');
+            selectedAlbumForRanking = null;
+            setAccentColor('--era-lover');
+       }
+       
+       async function shareRanking() {
+            screenshotTarget.style.display = 'block';
+            const canvas = await html2canvas(screenshotTarget, { backgroundColor: getComputedStyle(document.body).backgroundColor, scale: 2 });
+            screenshotTarget.style.display = 'none';
+            const link = document.createElement('a');
+            link.download = `${selectedAlbumForRanking.name.replace(/ /g, '_')}_Ranking.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+       }
+
+
+       // === INITIALIZATION ===
+        document.addEventListener('DOMContentLoaded', () => {
+           navLinks.forEach(link => {
+               link.addEventListener('click', (e) => {
+                   e.preventDefault();
+                   showSection(link.dataset.section);
+               });
+           });
+
+           newFactBtn.addEventListener('click', displayRandomFact);
+           modalCloseBtn.addEventListener('click', () => modalOverlay.classList.remove('show'));
+           
+           songOption1Btn.addEventListener('click', () => handleChoice(1));
+           songOption2Btn.addEventListener('click', () => handleChoice(2));
+           shareRankingBtn.addEventListener('click', shareRanking);
+           rankAgainBtn.addEventListener('click', resetSongRankingUI);
+           
+           showSection('home');
+           createEraCards();
+           populateAlbumSelectionGrid();
+           resetSongRankingUI();
+           displayRandomFact();
+        });
+
+    </script>
+</body>
+</html>
